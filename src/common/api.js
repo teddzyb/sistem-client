@@ -1,7 +1,7 @@
 import axios from "axios";
 
- axios.defaults.baseURL = "https://sistem-408807.et.r.appspot.com"; 
- /* axios.defaults.baseURL = "http://localhost:3001"; */
+// axios.defaults.baseURL = "https://sistem-408807.et.r.appspot.com";
+axios.defaults.baseURL = "http://localhost:3001";
 
 class Api {
   constructor() {
