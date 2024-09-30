@@ -1,0 +1,37 @@
+{
+    "menu": [
+        {
+            "title": "Dashboard",
+            "link": "/dashboard"
+        },
+        {
+            "title" : "Enrollment",
+            "children" : [
+                {
+                    "title" : "Create New Special Request",
+                    "link" : "/enrollment/create-new-request"
+                },
+                {
+                    "title" : "Existing Special Requests",
+                    "link" : "/enrollment/all-requests"
+                },
+                {
+                    "title" : "Petitions/Tutorials",
+                    "link" : "/enrollment/petitions-tutorials"
+                }
+            ]
+        },
+        {
+            "title" : "Study Plan",
+            "link" : "/study-plan"
+        },
+        {
+            "title" : "Submit Grades",
+            "link" : "/grades"
+        },
+        {
+            "title" : "Courses Status",
+            "link" : "/prospectus"
+        }
+    ]
+}

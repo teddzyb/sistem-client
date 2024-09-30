@@ -1,0 +1,54 @@
+{
+    "menu" : [
+        {
+            "title" : "Dashboard",
+            "link" : "/dashboard"
+        },
+        {
+            "title" : "Show Special Requests",
+            "link" : "/all-special-requests"
+        },
+        {
+            "title" : "Petitions/Tutorials",
+            "link" : "/petitions-tutorials-list"
+        },
+        {
+            "title" : "Student Study Plan",
+            "link" : "/current-study-plan"
+        },
+        {
+            "title": "Course Offerings",
+            "link": "/course-offerings"
+        },
+        {
+            "title" : "MOA",
+            "link" : "/moa"
+        },
+        {
+            "title" : "Student Management",
+            "children" : [
+                {
+                    "title" : "Student for Retention Compliance",
+                    "link" : "/student-management/retention-compliance"
+                },
+                {
+                    "title" : "View All Students",
+                    "link" : "/student-management/all-students"
+                }
+            ]
+        },
+        {
+            "title" : "Admin Controls",
+            "children" : [
+                {
+                    "title" : "Manage Users",
+                    "link" : "/admin-controls/manage-users"
+                },
+                {
+                    "title" : "Manage Enrollment",
+                    "link" : "/admin-controls/manage-enrollment"
+                }
+            ]
+        }
+    ]
+}
