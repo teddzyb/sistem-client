@@ -7,6 +7,7 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowBackOutlined } from '@mui/icons-material'
 import { green } from '@mui/material/colors'
+import useGetUser from "@/src/hooks/useGetUser"
 
 const Profile = () => {
   loginIsRequiredClient()
@@ -23,9 +24,9 @@ const Profile = () => {
   const [rows, setRows] = useState([])
   const [failedCourses, setFailedCourses] = useState([])
 
+  const user = useGetUser();
 
-
-  const fetchUserDetails = useCallback(async (user) => {
+  const fetchUserDetails = async (user) => {
     setIsLoading(true)
     const userType = user?.user_type
     const dates = user
@@ -41,69 +42,72 @@ const Profile = () => {
 
     const formattedCreatedAt = formatDate(createdAt);
     const formattedUpdatedAt = formatDate(updatedAt);
-    
+
     setCreatedAt(formattedCreatedAt);
     setUpdatedAt(formattedUpdatedAt);
 
     setUsertype(userType)
-   if(user){
-    if(user?.user_type === 'student'){
-      const id = user?.idNumber;
-      const firstName = user?.firstName
-      const lastName = user?.lastName
-      const yearLevel = user?.yearLevel
-      const email = user?.email
-      const program = fullProgramName(user?.program)
-      const userDetails = {
-        id,
-        firstName,
-        lastName,
-        yearLevel,
-        email,
-        program
-      };
-      setStudentDetails(userDetails)
-      setStudentProgram(program)
-  
-      const responseGrade = await api.getGrades(id)
-      responseGrade?.data?.grade.courses.forEach((gradeInfo) => {
-        rows.push({
-          semester: gradeInfo.semester,
+    if (user) {
+      if (user?.user_type === 'student') {
+        const id = user?.idNumber;
+        const firstName = user?.firstName
+        const lastName = user?.lastName
+        const yearLevel = user?.yearLevel
+        const email = user?.email
+        const program = fullProgramName(user?.program)
+        const userDetails = {
+          id,
+          firstName,
+          lastName,
+          yearLevel,
+          email,
+          program
+        };
+        setStudentDetails(userDetails)
+        setStudentProgram(program)
+
+        const responseGrade = await api.getGrades(id)
+        responseGrade?.data?.grade.courses.forEach((gradeInfo) => {
+          rows.push({
+            semester: gradeInfo.semester,
+          });
         });
-      });
-      
-      const groupedCourses = groupCoursesByYearAndSemester(rows);
-      setRows(groupedCourses);
-    }
-    else if(user?.user_type === 'faculty'){
-      const id = user?.idNumber;
-      const firstName = user?.firstName
-      const lastName = user?.lastName
-      const email = user?.email
-      const pos = user?.position
 
-      const userDetails = {
-        id,
-        firstName,
-        lastName,
-        email,
-      };
+        const groupedCourses = groupCoursesByYearAndSemester(rows);
+        setRows(groupedCourses);
+      }
+      else if (user?.user_type === 'faculty') {
+        const id = user?.idNumber;
+        const firstName = user?.firstName
+        const lastName = user?.lastName
+        const email = user?.email
+        const pos = user?.position
 
-      setStudentDetails(userDetails)
-      setStudentProgram(pos)
+        const userDetails = {
+          id,
+          firstName,
+          lastName,
+          email,
+        };
+
+        setStudentDetails(userDetails)
+        setStudentProgram(pos)
+      }
     }
-   }
-  
+
     setIsLoading(false);
-  }, [params])
+  }
 
   const fullProgramName = (program) => {
     switch (program?.replace(/\s/g, '')) {
-      case 'BSIS' || 'BS IS':
+      case 'BSIS':
+      case 'BS IS':
         return 'BACHELOR OF SCIENCE IN INFORMATION SYSTEMS';
-      case 'BSIT' || 'BS IT':
+      case 'BSIT':
+      case 'BS IT':
         return 'BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY';
-      case 'BSCS' || 'BS CS':
+      case 'BSCS':
+      case 'BS CS':
         return 'BACHELOR OF SCIENCE IN COMPUTER SCIENCE';
       default:
         return 'FACULTY / ADMIN / COORDINATOR';
@@ -122,7 +126,7 @@ const Profile = () => {
       return acc;
     }, {});
   };
-  const fetchUnitInfo = useCallback(async (user) =>{
+  const fetchUnitInfo = async (user) => {
     const id = user?.idNumber;
     const responseGrade = await api.getGrades(id)
     const courses = responseGrade.data?.grade?.courses
@@ -131,27 +135,23 @@ const Profile = () => {
 
     const data = courses?.map((gradeInfo) => {
       const rows = []
-      if(!gradeInfo.isPassed && gradeInfo.finalGrade !== "NG"){
+      if (!gradeInfo.isPassed && gradeInfo.finalGrade !== "NG") {
         studentTotalUnitsFailed += parseInt(gradeInfo.units)
-        return{
-            units: parseInt(gradeInfo.units),
-            courseCode: gradeInfo.courseCode,
-            verdict: "FAILED"
+        return {
+          units: parseInt(gradeInfo.units),
+          courseCode: gradeInfo.courseCode,
+          verdict: "FAILED"
         }
-    }
+      }
     })
-    
-   setValue(studentTotalUnitsFailed)
-  })
+
+    setValue(studentTotalUnitsFailed)
+  }
 
   useEffect(() => {
-    const init = async () => {
-      const user = await getUser()
-      fetchUserDetails(user)
-      fetchUnitInfo(user)
-    }
-    init()
-  }, []);
+    fetchUserDetails(user)
+    fetchUnitInfo(user)
+  }, [user]);
 
   const CustomTabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -176,7 +176,7 @@ const Profile = () => {
 
   return (
     <div className='w-full'>
-          
+
       <Typography className='text-teal-600 font-bold text-lg'>
         <IconButton onClick={() => router.back()}>
           <ArrowBackOutlined />
@@ -189,14 +189,14 @@ const Profile = () => {
             ID Number
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-                {(() => {
-                  switch (Boolean(studentDetails?.id)) {
-                    case true:
-                      return studentDetails.id;
-                    default:
-                      return 'N/A';
-                  }
-                })()}
+            {(() => {
+              switch (Boolean(studentDetails?.id)) {
+                case true:
+                  return studentDetails.id;
+                default:
+                  return 'N/A';
+              }
+            })()}
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -216,97 +216,97 @@ const Profile = () => {
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
-         
+
           <Typography className='text-black-400 font-bold'>
-          Email
+            Email
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-          {studentDetails?.email} 
+            {studentDetails?.email}
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
-        <Typography className='text-black-400 font-bold'>
-              Last Name
+          <Typography className='text-black-400 font-bold'>
+            Last Name
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-             {studentDetails?.lastName}
+            {studentDetails?.lastName}
           </Typography>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
 
           {
-            (() =>{
-             
-              switch (usertype){
-                case  'student':
+            (() => {
+
+              switch (usertype) {
+                case 'student':
                   return (
                     <>
-                        <Typography className='text-black-400 font-bold'>
-                            Program
-                        </Typography>
-                        <Typography className='text-gray-600 font-bold'>
-                            {studentProgram}
-                        </Typography>
+                      <Typography className='text-black-400 font-bold'>
+                        Program
+                      </Typography>
+                      <Typography className='text-gray-600 font-bold'>
+                        {studentProgram}
+                      </Typography>
                     </>
                   )
                 case 'faculty':
                   return (
                     <>
-                        <Typography className='text-black-400 font-bold'>
-                            Assigned Role
-                        </Typography>
-                        <Typography className='text-gray-600 font-bold'>
-                            {studentProgram}
-                        </Typography>
+                      <Typography className='text-black-400 font-bold'>
+                        Assigned Role
+                      </Typography>
+                      <Typography className='text-gray-600 font-bold'>
+                        {studentProgram}
+                      </Typography>
                     </>
                   )
                 default:
-                return(
-                  <Typography className='text-gray-600 font-bold'>
-                  UNDEFINED
-                  </Typography>
-                )
-                  
+                  return (
+                    <Typography className='text-gray-600 font-bold'>
+                      UNDEFINED
+                    </Typography>
+                  )
+
               }
             })()
           }
         </Grid>
         <Grid item xs={12} md={6}>
           {
-              (() => {
-                  switch (Object.keys(rows).length > 0) {
-                 
-                      case true:
-                          return (
-                            <>
-                            <Typography className='text-black-400 font-bold'>
-                              First Enrolled
-                            </Typography><Typography className='text-gray-600 font-bold'>
-                                {Object.keys(rows)[0]}
-                              </Typography>
-                            </>
-                          );
-                          
-                      default:
-                          return (
-                            <>
-                            <Typography className='text-black-400 font-bold'>
-                              Join Date
-                            </Typography><Typography className='text-gray-600 font-bold'>
-                                {createdAt}
-                              </Typography>
-                            </>
-                        
-                          );
-                  }
-              })()
+            (() => {
+              switch (Object.keys(rows).length > 0) {
+
+                case true:
+                  return (
+                    <>
+                      <Typography className='text-black-400 font-bold'>
+                        First Enrolled
+                      </Typography><Typography className='text-gray-600 font-bold'>
+                        {Object.keys(rows)[0]}
+                      </Typography>
+                    </>
+                  );
+
+                default:
+                  return (
+                    <>
+                      <Typography className='text-black-400 font-bold'>
+                        Join Date
+                      </Typography><Typography className='text-gray-600 font-bold'>
+                        {createdAt}
+                      </Typography>
+                    </>
+
+                  );
+              }
+            })()
           }
 
-        
+
         </Grid>
         <Grid item xs={12} md={6}>
-        {
+          {
             (() => {
               switch (Boolean(studentDetails?.yearLevel)) {
                 case true:
@@ -316,9 +316,9 @@ const Profile = () => {
                         Year Level
                       </Typography>
                       <Typography className='text-gray-600 font-bold'>
-                        <Tooltip title ='Year level standing 
-                        is evaluated base on the unit count and courses passed'> 
-                        {studentDetails.yearLevel}
+                        <Tooltip title='Year level standing 
+                        is evaluated base on the unit count and courses passed'>
+                          {studentDetails.yearLevel}
                         </Tooltip>
                       </Typography>
                     </>
@@ -336,30 +336,30 @@ const Profile = () => {
                   );
               }
             })()
-        }
+          }
         </Grid>
         <Grid item xs={12} md={6}>
           <Typography className='text-black-400 font-bold'>
-              Status
+            Status
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-          {(() => {
-            switch(true) {
-              case value > 9:
-                return  'IRREGULAR / PROBATIONARY'
-              case value >= 0 && value <= 3:
-                return 'REGULAR'
-              case value >= 3 && value <=9:
-                return 'IRREGULAR'
-              default:
-                return  'N/A'
-            }
-          })()}
+            {(() => {
+              switch (true) {
+                case value > 9:
+                  return 'IRREGULAR / PROBATIONARY'
+                case value >= 0 && value <= 3:
+                  return 'REGULAR'
+                case value >= 3 && value <= 9:
+                  return 'IRREGULAR'
+                default:
+                  return 'N/A'
+              }
+            })()}
           </Typography>
         </Grid>
-     
+
       </Grid>
-      
+
     </div>
   )
 
