@@ -131,7 +131,7 @@ const Header = ({ openMenu, setOpenMenu }) => {
   const handleMarkAllAsRead = async () => {
     try {
       const id = user._id;
-  
+
       const markAsReadPromises = [];
       notifications.forEach(notification => {
         const formData = {
@@ -143,9 +143,9 @@ const Header = ({ openMenu, setOpenMenu }) => {
       const responses = await Promise.all(markAsReadPromises);
       const allMarkedAsRead = responses.every(response => response?.status === 200);
       if (allMarkedAsRead) {
-        fetchNotifications(id); 
+        fetchNotifications(id);
       }
-  
+
     } catch (error) {
       console.log(error);
     }
@@ -166,7 +166,7 @@ const Header = ({ openMenu, setOpenMenu }) => {
             `/enrollment/petitions-tutorials/${notification.itemID}`
           );
           break;
-          case "study plan":
+        case "study plan":
           router.push(
             `/study-plan`
           );
@@ -321,7 +321,7 @@ const Header = ({ openMenu, setOpenMenu }) => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar color="transparent" sx={{boxShadow: '0px 0px 1px 0px rgba(0,0,0,0.01)', backgroundColor: '#F7F7F7'}} className="opacity-95">
+      <AppBar color="transparent" sx={{ boxShadow: '0px 0px 1px 0px rgba(0,0,0,0.01)', backgroundColor: '#F7F7F7' }} className="opacity-95">
         <Toolbar>
           <Box
             sx={{
@@ -397,7 +397,7 @@ const Header = ({ openMenu, setOpenMenu }) => {
               className="cursor-pointer"
               onClick={() => router.push('/dashboard')}
             >
-            
+
               SISTEM{" "}
             </Typography>
           </Box>
@@ -446,39 +446,39 @@ const Header = ({ openMenu, setOpenMenu }) => {
               className="min-w-[500px] mt-8 "
             >
               <Box className="w-full p-4 max-w-xs" sx={{ overflow: 'hidden' }}>
-                
+
                 <Typography className="font-bold items-center">
                   Notifications
                 </Typography>
-                {notifications.length  === 0 ||
-                <Tooltip title='Clear All Notifications'> 
-                <Button onClick={handleMarkAllAsRead} color="primary" variant="inherit" sx={{marginLeft: '12.6em', marginTop:'-3.1em' }}>
-                Mark All as Read
-                </Button>
-                </Tooltip>
-              }
+                {notifications.length === 0 ||
+                  <Tooltip title='Clear All Notifications'>
+                    <Button onClick={handleMarkAllAsRead} color="primary" variant="inherit" sx={{ marginLeft: '12.6em', marginTop: '-3.1em' }}>
+                      Mark All as Read
+                    </Button>
+                  </Tooltip>
+                }
                 {notifications.length === 0 ? (
                   <Typography className="w-full p-4 max-w-xs">No notifications</Typography>
                 ) :
                   notifications.map((notification, index) => (
                     <List className="flex flex-col items-center justify-center" key={index}>
                       <ListItemButton
-                          onClick={() => {
-                            handleClickNotification(notification);
-                            /* handleReadNotification(notification); */
-                          }}
+                        onClick={() => {
+                          handleClickNotification(notification);
+                          /* handleReadNotification(notification); */
+                        }}
                       >
                         <ListItem sx={{ marginTop: '-1em' }}>
-                          <ListItemText >{notification.message} <Divider/> 
-                          <Typography  sx={{textAlign: 'right'}}> 
-                            {new Date(notification.createdAt)?.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                          })}
-                          </Typography>
+                          <ListItemText >{notification.message} <Divider />
+                            <Typography sx={{ textAlign: 'right' }}>
+                              {new Date(notification.createdAt)?.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: 'numeric',
+                              })}
+                            </Typography>
                           </ListItemText>
                         </ListItem>
                       </ListItemButton>
@@ -497,8 +497,8 @@ const Header = ({ openMenu, setOpenMenu }) => {
 
                   ))}
                 <Divider />
-           
-              
+
+
                 {/* <Tooltip title='Mark as Read'>
                   <IconButton
                     sx={{ cursor: "pointer", marginLeft: '13em', fontSize: "1.0rem", fontWeight: "bold" }}
@@ -530,11 +530,11 @@ const Header = ({ openMenu, setOpenMenu }) => {
             >
               <Typography className="px-3 font-semibold">
                 {user?.firstName} {user?.lastName}  - {user?.user_type === 'student' ? 'Student' : user?.position}
-               {/*  {console.log(user.position)} */}
+                {/*  {console.log(user.position)} */}
               </Typography>
-              <MenuItem     
-              onClick={() => {
-                router.push(`/profile/${user?._id}`)
+              <MenuItem
+                onClick={() => {
+                  router.push("/profile")
                 }}>Profile</MenuItem>
               <MenuItem onClick={handleSignOut}>Log Out</MenuItem>
             </Menu>

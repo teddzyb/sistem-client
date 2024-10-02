@@ -1,12 +1,11 @@
 'use client'
 
-import { getUser, loginIsRequiredClient } from '@/src/app/lib/loginClient'
+import { loginIsRequiredClient } from '@/src/app/lib/loginClient'
 import api from '@/src/common/api'
-import { Grid, Typography, IconButton, Tabs, Tab, Box, Divider, Tooltip } from '@mui/material'
-import { useParams, useSearchParams, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { Grid, Typography, IconButton, Box, Tooltip } from '@mui/material'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { ArrowBackOutlined } from '@mui/icons-material'
-import { green } from '@mui/material/colors'
 import useGetUser from "@/src/hooks/useGetUser"
 
 const Profile = () => {
@@ -17,12 +16,9 @@ const Profile = () => {
   const [createdAt, setCreatedAt] = useState('')
   const [updatedAt, setUpdatedAt] = useState('')
   const [studentDetails, setStudentDetails] = useState({})
-  const [totalUnitsPassed, setTotalUnitsPassed] = useState(0);
-  const params = useParams().id
   const [value, setValue] = useState(0);
   const [isLoading, setIsLoading] = useState(false)
   const [rows, setRows] = useState([])
-  const [failedCourses, setFailedCourses] = useState([])
 
   const user = useGetUser();
 
