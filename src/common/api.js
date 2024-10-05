@@ -1,8 +1,6 @@
 import axios from "axios";
 
-// axios.defaults.baseURL = "https://sistem-408807.et.r.appspot.com";
-//axios.defaults.baseURL = "http://localhost:3001";
-axios.defaults.baseURL = "https://sistembackend.dcism.org";
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 class Api {
   constructor() {
