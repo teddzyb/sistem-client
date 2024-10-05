@@ -31,7 +31,6 @@ const StudentDetails = () => {
   const [failedCourses, setFailedCourses] = useState([])
   const [currentLoad, setCurrentLoad] = useState([])
   const [open, setOpen] = useState(false)
-  const [studentRows, setStudentRows] = useState([]);
 
   const handleOpen = () => {
     setOpen(true)
@@ -40,10 +39,8 @@ const StudentDetails = () => {
     setOpen(false)
   }
 
-
-
   const fetchStudentDetails = useCallback(async () => {
-    try{
+    try {
       setIsLoading(true)
       const response = await api.getUser(params)
       setStudentDetails(response?.data?.user)
@@ -113,137 +110,137 @@ const StudentDetails = () => {
     }, {});
   };
 
-  const fetchGradeInfo = useCallback(async () =>{
+  const fetchGradeInfo = useCallback(async () => {
     setIsLoading(true)
-   try{
-    const responseUser = await api.getUser(params)
-    const response = await api.getGrades(responseUser?.data?.user?.idNumber)
-    const courses = response.data?.grade?.courses;
-    const accredited = response?.data?.grade.accreditedCourses
+    try {
+      const responseUser = await api.getUser(params)
+      const response = await api.getGrades(responseUser?.data?.user?.idNumber)
+      const courses = response.data?.grade?.courses;
+      const accredited = response?.data?.grade.accreditedCourses
 
-    const currentLoad = courses?.filter((course) => course.finalGrade === "NG")
-    setCurrentLoad(currentLoad)
-    
+      const currentLoad = courses?.filter((course) => course.finalGrade === "NG")
+      setCurrentLoad(currentLoad)
 
-    let studentTotalUnits = 0;
-    let studentTotalUnitsFailed = 0;
-    let studentTotalUnitsCurrent = 0;
-    let count = 0
-    {
-      courses?.map((gradeInfo) => {
-        if (
-          gradeInfo.isPassed &&
-          (
-            gradeInfo.courseCode.includes("IS") ||
-            gradeInfo.courseCode.includes("IT") ||
-            gradeInfo.courseCode.includes("CS") ||
-            gradeInfo.courseCode.includes("CIS") ||
-            gradeInfo.courseCode.includes("GE-") ||
-            gradeInfo.courseCode.includes("EDM") ||
-            gradeInfo.courseCode.includes("NSTP") ||
-            gradeInfo.courseCode.includes("FILIPINO") ||
-            gradeInfo.courseCode.includes("TPE")
-          )
-        ) {
-          studentTotalUnits += parseInt(gradeInfo.units);
-        } else if (
-          gradeInfo.finalGrade === "NG" &&
-          (
-            gradeInfo.courseCode.includes("IS") ||
-            gradeInfo.courseCode.includes("IT") ||
-            gradeInfo.courseCode.includes("CS") ||
-            gradeInfo.courseCode.includes("CIS") ||
-            gradeInfo.courseCode.includes("GE-") ||
-            gradeInfo.courseCode.includes("EDM") ||
-            gradeInfo.courseCode.includes("NSTP") ||
-            gradeInfo.courseCode.includes("FILIPINO") ||
-            gradeInfo.courseCode.includes("TPE")
-          )
-        ) {
-          studentTotalUnitsCurrent += parseInt(gradeInfo.units);
-        } else if (
-          gradeInfo.finalGrade === "INC" ||
-          gradeInfo.finalGrade === "W"
-        ) {
-          return null;
-        } else if (
-          (
-            gradeInfo.courseCode.includes("IS") ||
-            gradeInfo.courseCode.includes("IT") ||
-            gradeInfo.courseCode.includes("CS") ||
-            gradeInfo.courseCode.includes("CIS") ||
-            gradeInfo.courseCode.includes("GE-") ||
-            gradeInfo.courseCode.includes("EDM") ||
-            gradeInfo.courseCode.includes("NSTP") ||
-            gradeInfo.courseCode.includes("FILIPINO") ||
-            gradeInfo.courseCode.includes("TPE")
-          )
-        ) {
-          studentTotalUnitsFailed += parseInt(gradeInfo.units);
-        }
-      })
-      .filter(Boolean);
-    }
-   
-    const regularCourseCodes = new Set(courses.map(course => course.courseCode));
-   
-    accredited.forEach(course => {
-      let commonSubstringFound = false;
-      regularCourseCodes.forEach(regularCode => {
-          if (course.equivalentCourse.course?.includes(regularCode) || course.equivalentCourse.courseCode?.includes(regularCode)) {
-              commonSubstringFound = true;
-              return;
+
+      let studentTotalUnits = 0;
+      let studentTotalUnitsFailed = 0;
+      let studentTotalUnitsCurrent = 0;
+      let count = 0
+      {
+        courses?.map((gradeInfo) => {
+          if (
+            gradeInfo.isPassed &&
+            (
+              gradeInfo.courseCode.includes("IS") ||
+              gradeInfo.courseCode.includes("IT") ||
+              gradeInfo.courseCode.includes("CS") ||
+              gradeInfo.courseCode.includes("CIS") ||
+              gradeInfo.courseCode.includes("GE-") ||
+              gradeInfo.courseCode.includes("EDM") ||
+              gradeInfo.courseCode.includes("NSTP") ||
+              gradeInfo.courseCode.includes("FILIPINO") ||
+              gradeInfo.courseCode.includes("TPE")
+            )
+          ) {
+            studentTotalUnits += parseInt(gradeInfo.units);
+          } else if (
+            gradeInfo.finalGrade === "NG" &&
+            (
+              gradeInfo.courseCode.includes("IS") ||
+              gradeInfo.courseCode.includes("IT") ||
+              gradeInfo.courseCode.includes("CS") ||
+              gradeInfo.courseCode.includes("CIS") ||
+              gradeInfo.courseCode.includes("GE-") ||
+              gradeInfo.courseCode.includes("EDM") ||
+              gradeInfo.courseCode.includes("NSTP") ||
+              gradeInfo.courseCode.includes("FILIPINO") ||
+              gradeInfo.courseCode.includes("TPE")
+            )
+          ) {
+            studentTotalUnitsCurrent += parseInt(gradeInfo.units);
+          } else if (
+            gradeInfo.finalGrade === "INC" ||
+            gradeInfo.finalGrade === "W"
+          ) {
+            return null;
+          } else if (
+            (
+              gradeInfo.courseCode.includes("IS") ||
+              gradeInfo.courseCode.includes("IT") ||
+              gradeInfo.courseCode.includes("CS") ||
+              gradeInfo.courseCode.includes("CIS") ||
+              gradeInfo.courseCode.includes("GE-") ||
+              gradeInfo.courseCode.includes("EDM") ||
+              gradeInfo.courseCode.includes("NSTP") ||
+              gradeInfo.courseCode.includes("FILIPINO") ||
+              gradeInfo.courseCode.includes("TPE")
+            )
+          ) {
+            studentTotalUnitsFailed += parseInt(gradeInfo.units);
           }
-      });
-  
-      if (!commonSubstringFound && course.accreditedCourse.isPassed) {
-          count += parseInt(course.equivalentCourse.units);
-         
+        })
+          .filter(Boolean);
       }
-  });
 
-    let combine = count + studentTotalUnits;
-    setTotalUnitsPassed(combine);
-    setTotalUnitsFailed(studentTotalUnitsFailed);
-   
-    const failRatio = (studentTotalUnitsFailed / combine) * 100;
-    const passRatio = 100 - failRatio
-    setStudentPassRate(passRatio.toFixed(2));
-    setStudentFailRate(failRatio.toFixed(2));
+      const regularCourseCodes = new Set(courses.map(course => course.courseCode));
 
-    //current units
-    setCurrentUnitLoad(studentTotalUnitsCurrent)
+      accredited.forEach(course => {
+        let commonSubstringFound = false;
+        regularCourseCodes.forEach(regularCode => {
+          if (course.equivalentCourse.course?.includes(regularCode) || course.equivalentCourse.courseCode?.includes(regularCode)) {
+            commonSubstringFound = true;
+            return;
+          }
+        });
 
-    //failed units
-    setStatusVal(studentTotalUnitsFailed)
-   }
-   catch(error){
-    console.error('there was an error', error)
-   }
-   setIsLoading(false)
-})
+        if (!commonSubstringFound && course.accreditedCourse.isPassed) {
+          count += parseInt(course.equivalentCourse.units);
 
-const fetchUnitValuesfromProspectus = useCallback(async () => {
-  setIsLoading(true);
-  try {
+        }
+      });
+
+      let combine = count + studentTotalUnits;
+      setTotalUnitsPassed(combine);
+      setTotalUnitsFailed(studentTotalUnitsFailed);
+
+      const failRatio = (studentTotalUnitsFailed / combine) * 100;
+      const passRatio = 100 - failRatio
+      setStudentPassRate(passRatio.toFixed(2));
+      setStudentFailRate(failRatio.toFixed(2));
+
+      //current units
+      setCurrentUnitLoad(studentTotalUnitsCurrent)
+
+      //failed units
+      setStatusVal(studentTotalUnitsFailed)
+    }
+    catch (error) {
+      console.error('there was an error', error)
+    }
+    setIsLoading(false)
+  })
+
+  const fetchUnitValuesfromProspectus = useCallback(async () => {
+    setIsLoading(true);
+    try {
       const responseUser = await api.getUser(params)
       const response = await api.getSuggestedCourses(responseUser?.data?.user?.idNumber);
       const suggestedCourses = response?.data.suggestedCourses.suggestedCourses;
       const rows = [];
       suggestedCourses?.forEach((gradeInfo) => {
-          rows.push({
-              units: gradeInfo.course.units,
-          });
+        rows.push({
+          units: gradeInfo.course.units,
+        });
       });
       const sumOfUnits = rows.reduce((acc, curr) => acc + curr.units, 0);
       setUnitValueProspectus(sumOfUnits)
       // console.log(sumOfUnits)
-  } catch (error) {
+    } catch (error) {
 
       console.error("Error occurred while fetching unit values:", error);
-  }
-  setIsLoading(false);
-}, []);
+    }
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     fetchStudentDetails();
@@ -251,8 +248,8 @@ const fetchUnitValuesfromProspectus = useCallback(async () => {
     fetchUnitValuesfromProspectus()
   }, []);
 
-  const studentPercentage = () =>{
-    if(totalUnitsPassed === 0 || unitValueProspectus === 0){
+  const studentPercentage = () => {
+    if (totalUnitsPassed === 0 || unitValueProspectus === 0) {
       return 0;
     }
     return ((totalUnitsPassed / unitValueProspectus) * 100).toFixed(2)
@@ -287,7 +284,7 @@ const fetchUnitValuesfromProspectus = useCallback(async () => {
   const rowsKey = Object.keys(rows)
   const lastSem = Object.keys(rows).length - 1
   let semLast = rowsKey[lastSem];
-  if(semLast === "COURSE ACCREDITED" && Object.keys(rows).length > 1){
+  if (semLast === "COURSE ACCREDITED" && Object.keys(rows).length > 1) {
     semLast = rowsKey[Object.keys(rows).length - 2]
   }
 
@@ -321,12 +318,12 @@ const fetchUnitValuesfromProspectus = useCallback(async () => {
             First Name
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-          {
+            {
 
-          studentDetails?.firstName === 'YEVGENY GRAZIO MARI' || studentDetails?.firstName === 'SHANNEN' || studentDetails?.firstName === 'KENT JOSEPH' ? //pls remove if we're gone :)
-          <Tooltip title='Developer'> {studentDetails?.firstName} </Tooltip> : studentDetails?.firstName
-          
-          }
+              studentDetails?.firstName === 'YEVGENY GRAZIO MARI' || studentDetails?.firstName === 'SHANNEN' || studentDetails?.firstName === 'KENT JOSEPH' ? //pls remove if we're gone :)
+                <Tooltip title='Developer'> {studentDetails?.firstName} </Tooltip> : studentDetails?.firstName
+
+            }
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -355,11 +352,11 @@ const fetchUnitValuesfromProspectus = useCallback(async () => {
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
-        <Typography className='text-black-400 font-bold'>
+          <Typography className='text-black-400 font-bold'>
             Year Level
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-            {studentDetails?.yearLevel} 
+            {studentDetails?.yearLevel}
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -367,42 +364,42 @@ const fetchUnitValuesfromProspectus = useCallback(async () => {
             Student Completion Rate
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-          <span className='text-green-600 font-bold'> {studentPercentage()}%  </span> ({totalUnitsPassed} / {unitValueProspectus} Total Units)
+            <span className='text-green-600 font-bold'> {studentPercentage()}%  </span> ({totalUnitsPassed} / {unitValueProspectus} Total Units)
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
-        <Typography className='text-black-400 font-bold'>
-            Current Study Load 
+          <Typography className='text-black-400 font-bold'>
+            Current Study Load
           </Typography>
-          <Button variant="contained" 
-          className='bg-cyan-600 text-white hover:bg-cyan-700'
-          onClick={handleOpen}
+          <Button variant="contained"
+            className='bg-cyan-600 text-white hover:bg-cyan-700'
+            onClick={handleOpen}
           >
-              View Here
+            View Here
           </Button>
-       </Grid>
+        </Grid>
         <Grid item xs={12} md={6}>
-        <Typography className='text-black-400 font-bold'>
+          <Typography className='text-black-400 font-bold'>
             Status
           </Typography>
           <Typography className='text-gray-600 font-bold'>
-          {(() => {
-            if (statusVal > 9) {
-              return 'IRREGULAR & PROBATIONARY';
-            } else if (statusVal >= 3  && statusVal <= 9) {
-              return 'IRREGULAR';
-            }else if(statusVal <= 3 && statusVal === 0){
-              return 'REGULAR';
-            }
-            else {
-              return 'N/A';
-            }
-          })()}
+            {(() => {
+              if (statusVal > 9) {
+                return 'IRREGULAR & PROBATIONARY';
+              } else if (statusVal >= 3 && statusVal <= 9) {
+                return 'IRREGULAR';
+              } else if (statusVal <= 3 && statusVal === 0) {
+                return 'REGULAR';
+              }
+              else {
+                return 'N/A';
+              }
+            })()}
           </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-       
-          </Grid>
+        </Grid>
+        <Grid item xs={12} md={6}>
+
+        </Grid>
         <Grid item xs={12} md={6}>
           <Typography className='text-black-400 font-bold'>
             Other Information
@@ -423,11 +420,11 @@ const fetchUnitValuesfromProspectus = useCallback(async () => {
         </Grid>
       </Grid>
       <CustomTabPanel value={value} index={0}>
-      <Typography className='text-black font-semibold'>
-        Student Passing Rate:
-        <span style={{ color: studentPassRate < 60 ? 'red' : 'green' }}>
-        {' '}{studentPassRate}% ({totalUnitsPassed} Units Taken)
-        </span>
+        <Typography className='text-black font-semibold'>
+          Student Passing Rate:
+          <span style={{ color: studentPassRate < 60 ? 'red' : 'green' }}>
+            {' '}{studentPassRate}% ({totalUnitsPassed} Units Taken)
+          </span>
         </Typography>
         <Typography variant='caption'>
           *Cumulative count is based on courses handled in DCISM and General Education
@@ -435,85 +432,85 @@ const fetchUnitValuesfromProspectus = useCallback(async () => {
         <GradesTable rows={rows} accreditedCourses={accreditedCourses} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-      <Typography className='text-black font-semibold'>
-      Student Failure Rate:
-      <span style={{ color: studentFailRate > 9 ? 'red' : 'green' }}>
-      {' '}{studentFailRate}% ({totalUnitsFailed} Units Failed)
-      </span>
-      </Typography>
+        <Typography className='text-black font-semibold'>
+          Student Failure Rate:
+          <span style={{ color: studentFailRate > 9 ? 'red' : 'green' }}>
+            {' '}{studentFailRate}% ({totalUnitsFailed} Units Failed)
+          </span>
+        </Typography>
         <GradesTable rows={failedCourses} />
       </CustomTabPanel>
       {  /* Dialog to view study load */}
       <Dialog open={open} onClose={handleClose} maxWidth='md'>
-            <DialogContent>
-             
-                    <Grid item xs={12} md={8}>
-                        <Box p={1}>
-                            <Typography className='text-cyan-600 font-bold mb-2'>
-                                Current Student Load
-                            </Typography>
-                            <Typography className='text-gray-600 font-semibold'>
-                                Units: {currentLoad?.reduce((acc, curr) => acc + parseInt(curr.units), 0)} ({semLast})
-                            </Typography>
-                            {currentLoad?.length > 0 ? (
-                                <Box className="border-solid border-slate-300 rounded-md p-3 m-1">
-                                    <Grid item xs={12}>
-                                        <Grid container spacing={12}>
-                                            <Grid item xs={3}>
-                                                <Typography className='text-cyan-600 font-semibold text-sm'>
-                                                    Course Code
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <Typography className='text-cyan-600 font-semibold text-sm'>
-                                                    Course Description
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={3}>
-                                                <Typography className='text-cyan-600 font-semibold text-sm'>
-                                                    Units
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                        <Divider />
-                                    </Grid>
-                                    {currentLoad.map((item, index) => (
-                                        <Grid item xs={12} key={index}>
-                                            <Grid container spacing={12}>
-                                                <Grid item xs={3}>
-                                                    <Typography className='text-gray-600 font-semibold text-sm'>
-                                                        {item.courseCode}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <Typography className='text-gray-600 font-semibold text-sm'>
-                                                        {item.courseDesc}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <Typography className='text-gray-600 font-semibold text-sm'>
-                                                        {item.units}
-                                                    </Typography>
-                                                </Grid>
-                                            </Grid>
-                                            <Divider />
-                                        </Grid>
-                                    ))}
-                                </Box>
-                            ) : (
-                                <Typography className='text-gray-600 font-semibold text-sm'>
-                                    No data to display for now...
-                                </Typography>
-                            )}
-                        </Box>
-                    </Grid>
+        <DialogContent>
 
-            </DialogContent>
-        </Dialog>
+          <Grid item xs={12} md={8}>
+            <Box p={1}>
+              <Typography className='text-cyan-600 font-bold mb-2'>
+                Current Student Load
+              </Typography>
+              <Typography className='text-gray-600 font-semibold'>
+                Units: {currentLoad?.reduce((acc, curr) => acc + parseInt(curr.units), 0)} ({semLast})
+              </Typography>
+              {currentLoad?.length > 0 ? (
+                <Box className="border-solid border-slate-300 rounded-md p-3 m-1">
+                  <Grid item xs={12}>
+                    <Grid container spacing={12}>
+                      <Grid item xs={3}>
+                        <Typography className='text-cyan-600 font-semibold text-sm'>
+                          Course Code
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography className='text-cyan-600 font-semibold text-sm'>
+                          Course Description
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography className='text-cyan-600 font-semibold text-sm'>
+                          Units
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider />
+                  </Grid>
+                  {currentLoad.map((item, index) => (
+                    <Grid item xs={12} key={index}>
+                      <Grid container spacing={12}>
+                        <Grid item xs={3}>
+                          <Typography className='text-gray-600 font-semibold text-sm'>
+                            {item.courseCode}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography className='text-gray-600 font-semibold text-sm'>
+                            {item.courseDesc}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Typography className='text-gray-600 font-semibold text-sm'>
+                            {item.units}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                      <Divider />
+                    </Grid>
+                  ))}
+                </Box>
+              ) : (
+                <Typography className='text-gray-600 font-semibold text-sm'>
+                  No data to display for now...
+                </Typography>
+              )}
+            </Box>
+          </Grid>
+
+        </DialogContent>
+      </Dialog>
     </div>
-    
+
   )
-  
+
 
 }
 
